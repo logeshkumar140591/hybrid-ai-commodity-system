@@ -1,0 +1,8 @@
+streamlit>=1.36
+pandas>=2.1
+numpy>=1.26
+smartapi-python
+pyotp
+logzero
+websocket-client
+requests
