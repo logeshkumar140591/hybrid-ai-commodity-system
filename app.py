@@ -93,14 +93,20 @@ def scan_one(name):
 
 with tabs[0]:
     st.subheader("Commodity Market Overview")
-    st.info("Select a valid MCX futures contract token in Setup. Strategy signals remain disabled until valid contract metadata and data are available.")
+    st.info(
+        "Select a valid MCX futures contract token in Setup. "
+        "Strategy signals remain disabled until valid contract metadata and data are available."
+    )
     cols = st.columns(3)
     for col, name in zip(cols, STRATEGIES):
-        col.metric(name, "NOT CONNECTED" if name not in contract_by_name else "CONTRACT MAPPED")
+        col.metric(name, "NOT CONFIGURED" if name not in contract_by_name else "CONTRACT MAPPED")
         col.caption("Paper mode • No orders")
     st.subheader("Open Paper Positions")
     trades = list_paper_trades(status="OPEN")
-    st.dataframe(pd.DataFrame(trades), use_container_width=True, hide_index=True) if trades else st.info("No open paper trades.")
+    if trades:
+        st.dataframe(pd.DataFrame(trades), use_container_width=True, hide_index=True)
+    else:
+        st.info("No open paper trades.")
 
 for tab, name in zip(tabs[1:4], STRATEGIES):
     with tab:
@@ -148,7 +154,10 @@ with tabs[4]:
     st.subheader("Commodity Risk Manager")
     st.write(f"Capital ₹{capital:,.0f} | Per-trade risk ₹{risk:,.0f} | Daily loss limit ₹{daily_limit:,.0f} | Max open trades {max_open}")
     st.info("Lot size, tick size and expiry must be verified from the current MCX contract master. Margin is not inferred by this tool.")
-    st.dataframe(pd.DataFrame(contracts), use_container_width=True, hide_index=True) if contracts else st.warning("No contract mappings loaded.")
+    if contracts:
+        st.dataframe(pd.DataFrame(contracts), use_container_width=True, hide_index=True)
+    else:
+        st.warning("No contract mappings loaded.")
 
 with tabs[5]:
     st.subheader("Historical Strategy Backtest")
@@ -168,7 +177,10 @@ with tabs[6]:
     open_trades = list_paper_trades("OPEN")
     closed_trades = list_paper_trades("CLOSED")
     st.write("Open positions")
-    st.dataframe(pd.DataFrame(open_trades), use_container_width=True, hide_index=True) if open_trades else st.info("No open positions.")
+    if open_trades:
+        st.dataframe(pd.DataFrame(open_trades), use_container_width=True, hide_index=True)
+    else:
+        st.info("No open positions.")
     if open_trades:
         ids = [str(x["id"]) for x in open_trades]
         selected = st.selectbox("Select paper trade to close", ids)
@@ -178,7 +190,10 @@ with tabs[6]:
             st.success("Paper trade closed.")
             st.rerun()
     st.write("Closed positions")
-    st.dataframe(pd.DataFrame(closed_trades), use_container_width=True, hide_index=True) if closed_trades else st.info("No closed paper trades.")
+    if closed_trades:
+        st.dataframe(pd.DataFrame(closed_trades), use_container_width=True, hide_index=True)
+    else:
+        st.info("No closed paper trades.")
 
 with tabs[7]:
     st.subheader("Angel One SmartAPI Setup")
